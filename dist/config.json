@@ -1,0 +1,12 @@
+{
+    "colors": {
+        "errosColor": {
+            "danger": "#ff1303",
+            "warn": "#dbc116"
+        },
+        "sucess": {
+            "online": "#3bff0f",
+            "saved": "#126dff"
+        }
+    }
+}
