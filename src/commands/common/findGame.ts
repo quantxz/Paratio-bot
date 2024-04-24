@@ -46,9 +46,10 @@ export default new Command({
                 uniqueUrls.add(game.urlToDownload);
                 return true;
             }
-        }).map((game: { name: any; urlToDownload: any; }) => ({
+        }).map((game: { name: any; urlToDownload: any; description: any; }) => ({
             label: game.name,
-            value: game.urlToDownload
+            value: game.urlToDownload,
+            description: game.description ? game.description : "" 
         }));
         
 
