@@ -68,7 +68,7 @@ export default new Command({
             const name = commandOptions.getString("game_name", true);
             const urlToDownload = commandOptions.getString("game_download_url", true);
             const { user } = buttonInteraction;
-            const description = commandOptions.getString("game_description", true)
+            const description = commandOptions.getString("game_description", false)
 
             if (description) {
                 await prisma.games.create({
