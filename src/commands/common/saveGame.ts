@@ -22,8 +22,25 @@ export default new Command({
         }
     ],
     type: ApplicationCommandType.ChatInput,
-    run({ interaction, options }) {
+    async run({ interaction, options }) {
+        await interaction.deferReply();
         commandOptions = options
+
+        const game = await prisma.games.findMany({
+            where: {
+                name: options.getString("game_name", true),
+                urlToDownload: options.getString("game_download_url", true)
+            }
+        })
+
+        if(game.length > 0) {
+            interaction.editReply({
+                content: `este jogo ja esta salvo em nosso banco dados`,
+            })
+
+            return;
+        }
+
         const Buttons = new ActionRowBuilder<ButtonBuilder>({
             components: [
                 new ButtonBuilder({ customId: "sucess-button", label: "sim", style: ButtonStyle.Success }),
@@ -31,10 +48,14 @@ export default new Command({
             ]
         })
 
-        interaction.reply({
-            content: `a url:\n${options.getString("game_download_url", true)}.\nEsta correta ?`,
+        interaction.editReply({
+            content: `a url:\n${options.getString("game_download_url", true)}.\nEsta correta ?\n(esta mensagem ira sumir em 15s)`,
             components: [Buttons]
         })
+
+        setTimeout(() => {
+            interaction.deleteReply()
+        }, 15000)
 
     },
     buttons: new Collection([
