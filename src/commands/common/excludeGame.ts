@@ -5,7 +5,7 @@ let commandOptions: CommandInteractionOptionResolver;
 const prisma = new PrismaClient();
 
 export default new Command({
-    name: "exclude_game",
+    name: "excludegame",
     description: "excluede a game from database",
     options: [
         {

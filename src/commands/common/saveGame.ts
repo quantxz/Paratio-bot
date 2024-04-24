@@ -19,6 +19,11 @@ export default new Command({
             description: "url for the game download website",
             required: true,
             type: ApplicationCommandOptionType.String,
+        },
+        {
+            name: "game_description",
+            description: "description",
+            type: ApplicationCommandOptionType.String,
         }
     ],
     type: ApplicationCommandType.ChatInput,
@@ -33,7 +38,7 @@ export default new Command({
             }
         })
 
-        if(game.length > 0) {
+        if (game.length > 0) {
             interaction.editReply({
                 content: `este jogo ja esta salvo em nosso banco dados`,
             })
@@ -63,16 +68,28 @@ export default new Command({
             const name = commandOptions.getString("game_name", true);
             const urlToDownload = commandOptions.getString("game_download_url", true);
             const { user } = buttonInteraction;
+            const description = commandOptions.getString("game_description", true)
 
-            await prisma.games.create({
-                data: {
-                    name: name,
-                    urlToDownload
-                }
-            });
-        
+            if (description) {
+                await prisma.games.create({
+                    data: {
+                        name: name,
+                        urlToDownload,
+                        description
+                    }
+                });
+            } else {
+                await prisma.games.create({
+                    data: {
+                        name: name,
+                        urlToDownload,
+                    }
+                });
+            }
+
+
             await buttonInteraction.deferReply({ ephemeral: true });
-        
+
             buttonInteraction.editReply({
                 content: `Muito obrigado por contribuir conosco ${user}, o jogo ${name} foi salvo em nosso banco de dados.`
             });
