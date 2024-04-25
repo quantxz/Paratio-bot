@@ -6,9 +6,15 @@ const client_1 = require("@prisma/client");
 let commandOptions;
 const prisma = new client_1.PrismaClient();
 exports.default = new Command_1.Command({
-    name: "savegame",
+    name: "save",
     description: "save the game url",
     options: [
+        {
+            name: "type",
+            description: "what you want find",
+            required: true,
+            type: discord_js_1.ApplicationCommandOptionType.String
+        },
         {
             name: "game_name",
             description: "the name of game",
@@ -30,29 +36,36 @@ exports.default = new Command_1.Command({
     type: discord_js_1.ApplicationCommandType.ChatInput,
     async run({ interaction, options }) {
         await interaction.deferReply();
+        const type = options.getString("type", true);
         commandOptions = options;
-        const game = await prisma.games.findMany({
-            where: {
-                name: options.getString("game_name", true),
-                urlToDownload: options.getString("game_download_url", true)
-            }
-        });
-        if (game.length > 0) {
-            interaction.editReply({
-                content: `este jogo ja esta salvo em nosso banco dados`,
-            });
-            return;
+        switch (type) {
+            case "game":
+                const game = await prisma.games.findMany({
+                    where: {
+                        name: options.getString("game_name", true),
+                        urlToDownload: options.getString("game_download_url", true)
+                    }
+                });
+                if (game.length > 0) {
+                    interaction.editReply({
+                        content: `este jogo ja esta salvo em nosso banco dados`,
+                    });
+                    return;
+                }
+                const Buttons = new discord_js_1.ActionRowBuilder({
+                    components: [
+                        new discord_js_1.ButtonBuilder({ customId: "sucess-button", label: "sim", style: discord_js_1.ButtonStyle.Success }),
+                        new discord_js_1.ButtonBuilder({ customId: "failed-button", label: "não", style: discord_js_1.ButtonStyle.Danger })
+                    ]
+                });
+                interaction.editReply({
+                    content: `a url:\n${options.getString("game_download_url", true)}.\nEsta correta ?\n(esta mensagem ira sumir em 15s)`,
+                    components: [Buttons]
+                });
+                break;
+            case "":
+                break;
         }
-        const Buttons = new discord_js_1.ActionRowBuilder({
-            components: [
-                new discord_js_1.ButtonBuilder({ customId: "sucess-button", label: "sim", style: discord_js_1.ButtonStyle.Success }),
-                new discord_js_1.ButtonBuilder({ customId: "failed-button", label: "não", style: discord_js_1.ButtonStyle.Danger })
-            ]
-        });
-        interaction.editReply({
-            content: `a url:\n${options.getString("game_download_url", true)}.\nEsta correta ?\n(esta mensagem ira sumir em 15s)`,
-            components: [Buttons]
-        });
         setTimeout(() => {
             interaction.deleteReply();
         }, 15000);
@@ -90,4 +103,4 @@ exports.default = new Command_1.Command({
             }]
     ])
 });
-//# sourceMappingURL=saveGame.js.map
+//# sourceMappingURL=save.js.map

@@ -45,7 +45,8 @@ exports.default = new Command_1.Command({
             }
         }).map((game) => ({
             label: game.name,
-            value: game.urlToDownload
+            value: game.urlToDownload,
+            description: game.description ? game.description : ""
         }));
         const row = new discord_js_1.ActionRowBuilder({
             components: [
