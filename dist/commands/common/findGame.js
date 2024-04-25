@@ -20,14 +20,21 @@ exports.default = new Command_1.Command({
     async run({ interaction, options }) {
         commandOptions = options;
         const gameName = options.getString("game_name", true);
+        const { user } = interaction;
         const games = await prisma.games.findMany({
             where: {
                 name: gameName
             }
         });
+        if (games.length <= 0) {
+            interaction.reply({
+                content: `deculpe ${user}, não consguimos encontrar | ${gameName} | em nosso banco de dados ＞﹏＜`
+            });
+            return;
+        }
         //criando uma coleção para guardar as urls
         const uniqueUrls = new Set();
-        const gameOptions = games.filter(game => {
+        const gameOptions = games.filter((game) => {
             //verificando se a url ja esta na coleção
             if (uniqueUrls.has(game.urlToDownload)) {
                 return false;
@@ -36,7 +43,7 @@ exports.default = new Command_1.Command({
                 uniqueUrls.add(game.urlToDownload);
                 return true;
             }
-        }).map(game => ({
+        }).map((game) => ({
             label: game.name,
             value: game.urlToDownload
         }));
@@ -56,9 +63,9 @@ exports.default = new Command_1.Command({
     selects: new discord_js_1.Collection([
         ["game-selection", async (selectIneteraction) => {
                 const value = selectIneteraction.values[0];
-                console.log(value);
+                const { user } = selectIneteraction;
                 selectIneteraction.reply({
-                    content: `aqui esta o download:\n${value}`
+                    content: `${user}, aqui esta o download:\n${value}`
                 });
             }]
     ])

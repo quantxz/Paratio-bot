@@ -19,6 +19,7 @@ export default new Command({
     async run({ interaction, options }) {
         commandOptions = options
         const gameName = options.getString("game_name", true)
+        const { user } = interaction
 
         const games = await prisma.games.findMany({
             where: {
@@ -27,9 +28,17 @@ export default new Command({
         })
         
 
+        if(games.length <= 0) {
+            interaction.reply({
+                content: `deculpe ${user}, não consguimos encontrar | ${gameName} | em nosso banco de dados ＞﹏＜`
+            })
+            
+            return;
+        }
+        
         //criando uma coleção para guardar as urls
         const uniqueUrls = new Set<string>();
-        const gameOptions = games.filter(game => {
+        const gameOptions = games.filter((game: { urlToDownload: string; }) => {
             //verificando se a url ja esta na coleção
             if (uniqueUrls.has(game.urlToDownload)) {
                 return false;
@@ -37,9 +46,10 @@ export default new Command({
                 uniqueUrls.add(game.urlToDownload);
                 return true;
             }
-        }).map(game => ({
+        }).map((game: { name: any; urlToDownload: any; description: any; }) => ({
             label: game.name,
-            value: game.urlToDownload
+            value: game.urlToDownload,
+            description: game.description ? game.description : "" 
         }));
         
 
@@ -61,10 +71,12 @@ export default new Command({
         ["game-selection", async (selectIneteraction) => {
 
             const value = selectIneteraction.values[0]
-            console.log(value)
+            const { user } = selectIneteraction
+
             selectIneteraction.reply({
-                content: `aqui esta o download:\n${value}`
+                content: `${user}, aqui esta o download:\n${value}`
             })
+
         }]
     ])
 })

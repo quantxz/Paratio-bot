@@ -19,11 +19,33 @@ export default new Command({
             description: "url for the game download website",
             required: true,
             type: ApplicationCommandOptionType.String,
+        },
+        {
+            name: "game_description",
+            description: "description",
+            type: ApplicationCommandOptionType.String,
         }
     ],
     type: ApplicationCommandType.ChatInput,
-    run({ interaction, options }) {
+    async run({ interaction, options }) {
+        await interaction.deferReply();
         commandOptions = options
+
+        const game = await prisma.games.findMany({
+            where: {
+                name: options.getString("game_name", true),
+                urlToDownload: options.getString("game_download_url", true)
+            }
+        })
+
+        if (game.length > 0) {
+            interaction.editReply({
+                content: `este jogo ja esta salvo em nosso banco dados`,
+            })
+
+            return;
+        }
+
         const Buttons = new ActionRowBuilder<ButtonBuilder>({
             components: [
                 new ButtonBuilder({ customId: "sucess-button", label: "sim", style: ButtonStyle.Success }),
@@ -31,10 +53,14 @@ export default new Command({
             ]
         })
 
-        interaction.reply({
-            content: `a url:\n${options.getString("game_download_url", true)}.\nEsta correta ?`,
+        interaction.editReply({
+            content: `a url:\n${options.getString("game_download_url", true)}.\nEsta correta ?\n(esta mensagem ira sumir em 15s)`,
             components: [Buttons]
         })
+
+        setTimeout(() => {
+            interaction.deleteReply()
+        }, 15000)
 
     },
     buttons: new Collection([
@@ -42,16 +68,28 @@ export default new Command({
             const name = commandOptions.getString("game_name", true);
             const urlToDownload = commandOptions.getString("game_download_url", true);
             const { user } = buttonInteraction;
+            const description = commandOptions.getString("game_description", false)
 
-            await prisma.games.create({
-                data: {
-                    name: name,
-                    urlToDownload
-                }
-            });
-        
+            if (description) {
+                await prisma.games.create({
+                    data: {
+                        name: name,
+                        urlToDownload,
+                        description
+                    }
+                });
+            } else {
+                await prisma.games.create({
+                    data: {
+                        name: name,
+                        urlToDownload,
+                    }
+                });
+            }
+
+
             await buttonInteraction.deferReply({ ephemeral: true });
-        
+
             buttonInteraction.editReply({
                 content: `Muito obrigado por contribuir conosco ${user}, o jogo ${name} foi salvo em nosso banco de dados.`
             });
