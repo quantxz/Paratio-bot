@@ -280,7 +280,6 @@ export default new Command({
                     await prisma.emulators.findMany(),
                     await prisma.softwares.findMany()
                 ])
-                
                 const arrayAllLinks = [...gameAll, ...seriesAll, ...moviesAll, ...emulatorsAll, ...softwaresAll];
 
                 if (arrayAllLinks.length <= 0) {
