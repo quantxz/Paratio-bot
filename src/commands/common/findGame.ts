@@ -16,7 +16,7 @@ export default new Command({
         }
     ],
     type: ApplicationCommandType.ChatInput,
-    async run({ interaction, options }) {
+    async run({ interaction, options }) { 
         commandOptions = options
         const gameName = options.getString("game_name", true)
         const { user } = interaction
