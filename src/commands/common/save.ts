@@ -67,6 +67,9 @@ export default new Command({
                     components: [Buttons]
                 })
                 break;
+            case "": 
+
+                break;
         }
 
 
