@@ -18,3 +18,39 @@ model games {
 
   @@map("games")
 }
+
+model series {
+  id            String @default(uuid()) @id
+  name          String @unique
+  urlToDownload String
+  description   String? 
+
+  @@map("series")
+}
+
+model movies {
+  id            String @default(uuid()) @id
+  name          String @unique
+  urlToDownload String
+  description   String? 
+
+  @@map("movies")
+}
+
+model emulators {
+  id            String @default(uuid()) @id
+  name          String @unique
+  urlToDownload String
+  description   String? 
+
+  @@map("emulators")
+}
+
+model softwares {
+  id            String @default(uuid()) @id
+  name          String @unique
+  urlToDownload String
+  description   String? 
+
+  @@map("softwares")
+}
